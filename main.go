@@ -13,7 +13,22 @@ type argT struct {
 	Retry int    `cli:"r,retry" usage:"Retry times while downloading images" dft:"2"`
 	NoPic bool   `cli:"nopic" usage:"Do not download images" dft:"false"`
 }
+func quickMaker(URL string,Out string,Retry int,NoPic bool)bool{
+	f := check(os.Create(Out)).(*os.File)
+	z := zip.NewWriter(f)
+	zop := newZipOp(z)
 
+	genor := &EpubGenor{}
+	genor.retry = Retry
+	genor.GetPic = !NoPic
+	getWenku8(URL, genor)
+	genor.MakeEpub(zop)
+
+	zop.Wait()
+	z.Close()
+	f.Close()
+	return true
+}
 func main() {
 	cli.Run(new(argT), func(ctx *cli.Context) error {
 		argv := ctx.Argv().(*argT)

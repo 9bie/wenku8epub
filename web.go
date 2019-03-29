@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 )
 
 // 一个十分暴力的小心数据筛选反代服务
@@ -34,6 +36,11 @@ func topList(w http.ResponseWriter, r *http.Request){
 	}
 func push(w http.ResponseWriter, r *http.Request){
 	if _, ok := r.Form["id"]; ok {
-
+		menUrl:= fmt.Sprintf("https://www.wenku8.net/modules/article/reader.php?aid=%s",ok)
+		file := time.Now().String()
+		err :=quickMaker(menUrl,file,50000,false)
+		if (!err){
+			push2mail("test",file,"html","wait@wait.com","LightNovel")
+		}
 	}
 }
