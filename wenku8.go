@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"regexp"
+
 )
 
 var (
@@ -71,4 +73,44 @@ func getChapter(url string) *goquery.Document {
 func mustGet(url string) *mahonia.Reader {
 	body := mahonia.NewDecoder("gbk").NewReader(check(httpGetWithRetry(url, 5)).(*http.Response).Body)
 	return body
+}
+
+
+func getList(url string)string{
+	resp, err := http.Get(url)
+	if err != nil {
+		// handle error
+		return "";
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		// handle error
+	}
+
+	start,last :=0,0;
+	since := body;
+	for{
+
+		flag1:=`<div style="width:373px;float:left;margin:5px 0px 5px 5px;">`;
+		flag2:=`加入`
+		if start != 0{
+			since = since[last:]
+		}
+		start = strings.Index(string(since), flag1);
+		if (start ==-1){
+			break;
+		}
+
+		last = strings.Index(string(since[start:]), flag2) +start;
+		if (last ==-1){
+			break;
+		}
+		fmt.Println(start,last);
+		fmt.Println(string(since[start:last]));
+
+	}
+
+
+	return "";
 }
